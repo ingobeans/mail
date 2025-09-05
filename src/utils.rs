@@ -9,7 +9,6 @@ pub fn create_camera(w: f32, h: f32) -> Camera2D {
     let cam = Camera2D {
         render_target: Some(rt),
         zoom: Vec2::new(1.0 / w * 2.0, 1.0 / h * 2.0),
-        target: Vec2::new(w / 2.0, h / 2.0),
         ..Default::default()
     };
     cam

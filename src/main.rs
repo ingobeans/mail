@@ -28,6 +28,9 @@ async fn main() {
         for chunk in world.collision.iter() {
             chunk.draw(&assets);
         }
+        for chunk in world.details.iter() {
+            chunk.draw(&assets);
+        }
 
         if is_key_down(KeyCode::A) {
             pixel_camera.target.x -= 5.0;

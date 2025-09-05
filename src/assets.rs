@@ -88,15 +88,18 @@ impl Spritesheet {
 pub struct World {
     pub collision: Vec<Chunk>,
     pub details: Vec<Chunk>,
+    pub interactable: Vec<Chunk>,
 }
 impl Default for World {
     fn default() -> Self {
         let xml = include_str!("../assets/tilemap/world.tmx");
-        let collisions = get_layer(xml, "Collisions");
-        let details = get_layer(xml, "Details");
+        let collisions = get_layer(xml, "Collision");
+        let details = get_layer(xml, "Detail");
+        let interactable = get_layer(xml, "Interactable");
         World {
             collision: get_all_chunks(collisions),
             details: get_all_chunks(details),
+            interactable: get_all_chunks(interactable),
         }
     }
 }
@@ -133,7 +136,7 @@ fn get_all_chunks(xml: &str) -> Vec<Chunk> {
     let mut xml = xml.to_string();
     loop {
         if let Some((current, remains)) = xml.split_once("</chunk>") {
-            let new = parse_chunk(&current.clone());
+            let new = parse_chunk(current);
             chunks.push(new);
             xml = remains.to_string();
         } else {
