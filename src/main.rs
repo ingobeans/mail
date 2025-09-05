@@ -5,10 +5,18 @@ use crate::{assets::*, utils::*};
 mod assets;
 mod utils;
 
-#[macroquad::main("mail")]
+fn window_conf() -> Conf {
+    Conf {
+        window_title: "mail".to_string(),
+        window_width: SCREEN_WIDTH as i32 * 3,
+        window_height: SCREEN_HEIGHT as i32 * 3,
+        ..Default::default()
+    }
+}
+#[macroquad::main(window_conf)]
 async fn main() {
     let assets = Assets::default();
-    let pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
+    let mut pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
     let world = World::default();
 
     loop {
@@ -19,6 +27,19 @@ async fn main() {
         clear_background(WHITE);
         for chunk in world.collision.iter() {
             chunk.draw(&assets);
+        }
+
+        if is_key_down(KeyCode::A) {
+            pixel_camera.target.x -= 5.0;
+        }
+        if is_key_down(KeyCode::D) {
+            pixel_camera.target.x += 5.0;
+        }
+        if is_key_down(KeyCode::W) {
+            pixel_camera.target.y -= 5.0;
+        }
+        if is_key_down(KeyCode::S) {
+            pixel_camera.target.y += 5.0;
         }
 
         set_default_camera();
