@@ -73,6 +73,7 @@ impl Player {
             (tile_x.floor(), (new.y / 8.0).floor(), false),
             (tile_x.floor(), (new.y / 8.0).ceil(), false),
             (tile_x.ceil(), (new.y / 8.0).floor(), false),
+            (tile_x.ceil(), (new.y / 8.0).ceil(), false),
         ];
 
         let mut chunks: Vec<&Chunk> = Vec::new();
@@ -87,6 +88,7 @@ impl Player {
         }
 
         for (tx, ty, x_axis) in tiles {
+            //draw_rectangle(tx.floor() * 8.0, ty.floor() * 8.0, 8.0, 8.0, RED);
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
                 if x_axis {
@@ -105,6 +107,7 @@ impl Player {
                     };
                     new.y = c;
                     self.velocity.y = 0.0;
+                    break;
                 }
             }
         }
