@@ -24,6 +24,7 @@ pub struct Player {
     pub facing_right: bool,
     pub on_ground: bool,
     pub debug_tiles: Vec<(f32, f32, f32, f32, Color)>,
+    pub jump_frames: u8,
     idle_animation: Animation,
     walk_animation: Animation,
 }
@@ -33,6 +34,7 @@ impl Player {
             pos: Vec2::ZERO,
             velocity: Vec2::ZERO,
             anim_frame: 0,
+            jump_frames: 0,
             facing_right: true,
             on_ground: false,
             debug_tiles: Vec::new(),
@@ -63,8 +65,14 @@ impl Player {
             self.facing_right = true;
         }
 
-        if is_key_down(KeyCode::Space) && self.on_ground {
-            forces.y -= 6.0;
+        if self.on_ground {
+            self.jump_frames = 0;
+        }
+        if is_key_down(KeyCode::Space)
+            && (self.on_ground || (self.jump_frames > 0 && self.jump_frames < 5))
+        {
+            forces.y -= if self.jump_frames == 0 { 3.5 } else { 1.0 };
+            self.jump_frames += 1;
         }
 
         forces.x -= self.velocity.x
