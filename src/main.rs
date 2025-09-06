@@ -1,3 +1,5 @@
+use std::env::args;
+
 use macroquad::{miniquad::window::screen_size, prelude::*, time};
 
 use crate::{assets::*, player::*, utils::*};
@@ -16,6 +18,9 @@ fn window_conf() -> Conf {
 }
 #[macroquad::main(window_conf)]
 async fn main() {
+    if args().any(|f| f == "debug") {
+        *IS_DEBUG.lock().unwrap() = true;
+    }
     let assets = Assets::default();
     let mut pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
     let world = World::default();

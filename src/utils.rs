@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use macroquad::prelude::*;
 
 pub const SCREEN_WIDTH: f32 = 256.0;
@@ -7,6 +9,8 @@ pub const MAX_VELOCITY: f32 = 1.2;
 pub const GROUND_FRICTION: f32 = 0.21;
 pub const AIR_DRAG: f32 = 0.07;
 pub const GRAVITY: f32 = 0.9;
+
+pub static IS_DEBUG: Mutex<bool> = Mutex::new(false);
 
 pub fn create_camera(w: f32, h: f32) -> Camera2D {
     let rt = render_target(w as u32, h as u32);
