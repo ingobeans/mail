@@ -36,8 +36,11 @@ async fn main() {
         pixel_camera.target = player.pos.floor();
         set_camera(&pixel_camera);
 
-        clear_background(Color::from_hex(0x588dbe));
+        clear_background(Color::from_hex(0xe3e6ff));
 
+        for chunk in world.background.iter() {
+            chunk.draw(&assets);
+        }
         for chunk in world.collision.iter() {
             chunk.draw(&assets);
         }

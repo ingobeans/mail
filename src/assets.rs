@@ -129,6 +129,7 @@ pub struct World {
     pub collision: Vec<Chunk>,
     pub one_way_collision: Vec<Chunk>,
     pub details: Vec<Chunk>,
+    pub background: Vec<Chunk>,
     pub interactable: Vec<Chunk>,
 }
 impl World {
@@ -146,10 +147,12 @@ impl Default for World {
         let one_way_collision = get_layer(xml, "OneWayCollision");
         let detail = get_layer(xml, "Detail");
         let interactable = get_layer(xml, "Interactable");
+        let background = get_layer(xml, "Background");
         World {
             collision: get_all_chunks(collision),
             one_way_collision: get_all_chunks(one_way_collision),
             details: get_all_chunks(detail),
+            background: get_all_chunks(background),
             interactable: get_all_chunks(interactable),
         }
     }
