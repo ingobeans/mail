@@ -19,6 +19,7 @@ pub struct Player {
     pub anim_frame: u32,
     pub facing_right: bool,
     pub on_ground: bool,
+    pub debug_tiles: Vec<(f32, f32, Color)>,
     idle_animation: Animation,
     walk_animation: Animation,
 }
@@ -30,6 +31,7 @@ impl Player {
             anim_frame: 0,
             facing_right: true,
             on_ground: false,
+            debug_tiles: Vec::new(),
             idle_animation: Animation::from_file(include_bytes!(
                 "../assets/entities/player/idle.ase"
             )),
@@ -39,6 +41,7 @@ impl Player {
         }
     }
     pub fn update(&mut self, world: &World) {
+        self.debug_tiles = Vec::new();
         self.anim_frame += 1000 / 60;
 
         let mut forces = Vec2::ZERO;
@@ -70,10 +73,10 @@ impl Player {
         let tile_y = self.pos.y / 8.0;
 
         let tiles_y = [
-            (tile_x.floor(), (new.y / 8.0).ceil()),
+            (tile_x.trunc(), (new.y / 8.0).ceil()),
             (tile_x.ceil(), (new.y / 8.0).ceil()),
-            (tile_x.floor(), (new.y / 8.0).floor()),
-            (tile_x.ceil(), (new.y / 8.0).floor()),
+            (tile_x.trunc(), (new.y / 8.0).trunc()),
+            (tile_x.ceil(), (new.y / 8.0).trunc()),
         ];
 
         let mut chunks: Vec<&Chunk> = Vec::new();
@@ -95,11 +98,12 @@ impl Player {
 
         self.on_ground = false;
         for (tx, ty) in tiles_y {
-            draw_rectangle(tx.floor() * 8.0, ty.floor() * 8.0, 8.0, 8.0, RED);
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
+                self.debug_tiles
+                    .push((tx.trunc() * 8.0, ty.trunc() * 8.0, RED));
                 let c = if self.velocity.y < 0.0 {
-                    tile_y.floor() * 8.0
+                    tile_y.trunc() * 8.0
                 } else {
                     self.on_ground = true;
                     tile_y.ceil() * 8.0
@@ -108,9 +112,16 @@ impl Player {
                 self.velocity.y = 0.0;
                 break;
             }
-            if self.velocity.y > 0.0 {
+
+            // handle single way platforms
+            if self.velocity.y > 0.0 && ty.trunc() > tile_y.trunc() {
+                //let ty = ty + 0.5;
+                self.debug_tiles
+                    .push((tx.trunc() * 8.0, ty.trunc() * 8.0, LIME));
                 if get_tile(&one_way_chunks, tx as i16, ty as i16) != 0 {
                     new.y = tile_y.ceil() * 8.0;
+                    self.debug_tiles
+                        .push((tx.trunc() * 8.0, ty.trunc() * 8.0, YELLOW));
                     self.velocity.y = 0.0;
                     self.on_ground = true;
                     break;
@@ -160,5 +171,8 @@ impl Player {
                 ..Default::default()
             },
         );
+        // for (x, y, color) in self.debug_tiles.iter() {
+        //     draw_rectangle(*x, *y, 8.0, 8.0, *color);
+        // }
     }
 }

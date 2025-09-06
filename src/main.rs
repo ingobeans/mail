@@ -44,10 +44,10 @@ async fn main() {
         for chunk in world.collision.iter() {
             chunk.draw(&assets);
         }
-        for chunk in world.one_way_collision.iter() {
+        for chunk in world.details.iter() {
             chunk.draw(&assets);
         }
-        for chunk in world.details.iter() {
+        for chunk in world.one_way_collision.iter() {
             chunk.draw(&assets);
         }
 
