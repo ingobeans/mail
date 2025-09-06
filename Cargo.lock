@@ -282,7 +282,7 @@ checksum = "64b1d96218903768c1ce078b657c0d5965465c95a60d2682fd97443c9d2483dd"
 
 [[package]]
 name = "mail"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "asefile",
  "image",

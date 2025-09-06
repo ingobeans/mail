@@ -41,7 +41,7 @@ async fn main() {
         pixel_camera.target = player.pos.floor();
         set_camera(&pixel_camera);
 
-        clear_background(Color::from_hex(0xe3e6ff));
+        clear_background(Color::from_hex(0x249fde));
 
         for chunk in world.background.iter() {
             chunk.draw(&assets);
