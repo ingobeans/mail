@@ -50,9 +50,13 @@ impl Player {
         self.debug_tiles = Vec::new();
         self.anim_frame += 1000 / 60;
 
+        let noclip = is_key_down(KeyCode::LeftShift);
+
         let mut forces = Vec2::ZERO;
 
-        forces.y += GRAVITY;
+        if !noclip {
+            forces.y += GRAVITY
+        }
 
         forces = forces.clamp_length_max(8.0);
 
@@ -73,6 +77,20 @@ impl Player {
         {
             forces.y -= if self.jump_frames == 0 { 3.5 } else { 1.0 };
             self.jump_frames += 1;
+        }
+
+        if noclip {
+            if is_key_down(KeyCode::W) {
+                forces.y -= 1.0;
+            }
+            if is_key_down(KeyCode::S) {
+                forces.y += 1.0;
+            }
+            self.velocity += forces * 2.0;
+            self.velocity = self.velocity.lerp(Vec2::ZERO, GROUND_FRICTION);
+
+            self.pos += self.velocity;
+            return;
         }
 
         forces.x -= self.velocity.x
