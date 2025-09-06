@@ -18,6 +18,7 @@ pub struct Player {
     pub velocity: Vec2,
     pub anim_frame: u32,
     pub facing_right: bool,
+    pub on_ground: bool,
     idle_animation: Animation,
     walk_animation: Animation,
 }
@@ -28,6 +29,7 @@ impl Player {
             velocity: Vec2::ZERO,
             anim_frame: 0,
             facing_right: true,
+            on_ground: false,
             idle_animation: Animation::from_file(include_bytes!(
                 "../assets/entities/player/idle.ase"
             )),
@@ -54,7 +56,7 @@ impl Player {
             self.facing_right = true;
         }
 
-        if is_key_down(KeyCode::Space) && self.velocity.y == 0.0 {
+        if is_key_down(KeyCode::Space) && self.on_ground {
             forces.y -= 6.0;
         }
 
@@ -91,6 +93,7 @@ impl Player {
             }
         }
 
+        self.on_ground = false;
         for (tx, ty) in tiles_y {
             draw_rectangle(tx.floor() * 8.0, ty.floor() * 8.0, 8.0, 8.0, RED);
             let tile = get_tile(&chunks, tx as i16, ty as i16);
@@ -98,6 +101,7 @@ impl Player {
                 let c = if self.velocity.y < 0.0 {
                     tile_y.floor() * 8.0
                 } else {
+                    self.on_ground = true;
                     tile_y.ceil() * 8.0
                 };
                 new.y = c;
@@ -108,6 +112,7 @@ impl Player {
                 if get_tile(&one_way_chunks, tx as i16, ty as i16) != 0 {
                     new.y = tile_y.ceil() * 8.0;
                     self.velocity.y = 0.0;
+                    self.on_ground = true;
                     break;
                 }
             }
