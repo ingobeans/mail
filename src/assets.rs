@@ -191,7 +191,6 @@ impl Chunk {
 
 fn get_all_chunks(xml: &str) -> Vec<Chunk> {
     let count = xml.lines().filter(|f| *f == "</chunk>").count();
-    println!("chunks amt: {count}");
     let mut chunks = Vec::new();
     let mut xml = xml.to_string();
     loop {
@@ -227,7 +226,6 @@ fn parse_chunk(xml: &str) -> Chunk {
         .1
         .split_once(">")
         .unwrap();
-    println!("{tag}");
 
     let x = tag
         .split_once("x=\"")
