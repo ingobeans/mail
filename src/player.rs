@@ -58,9 +58,9 @@ impl Player {
 
         self.velocity += forces;
 
-        if self.velocity.x.abs() < 0.3 {
-            self.velocity.x = 0.0;
-        }
+        //if self.velocity.x.abs() < 0.3 {
+        //    self.velocity.x = 0.0;
+        //}
 
         let mut new = self.pos + self.velocity;
 
@@ -68,12 +68,10 @@ impl Player {
         let tile_y = self.pos.y / 8.0;
 
         let tiles = [
-            ((new.x / 8.0).floor(), tile_y.floor(), true),
-            ((new.x / 8.0).ceil(), tile_y.ceil(), true),
-            (tile_x.floor(), (new.y / 8.0).floor(), false),
-            (tile_x.floor(), (new.y / 8.0).ceil(), false),
-            (tile_x.ceil(), (new.y / 8.0).floor(), false),
-            (tile_x.ceil(), (new.y / 8.0).ceil(), false),
+            (tile_x.floor(), (new.y / 8.0).floor()),
+            (tile_x.ceil(), (new.y / 8.0).floor()),
+            (tile_x.floor(), (new.y / 8.0).ceil()),
+            (tile_x.ceil(), (new.y / 8.0).ceil()),
         ];
 
         let mut chunks: Vec<&Chunk> = Vec::new();
@@ -87,31 +85,44 @@ impl Player {
             }
         }
 
-        for (tx, ty, x_axis) in tiles {
+        for (tx, ty) in tiles {
+            draw_rectangle(tx.floor() * 8.0, ty.floor() * 8.0, 8.0, 8.0, RED);
+            let tile = get_tile(&chunks, tx as i16, ty as i16);
+            if tile != 0 {
+                let c = if self.velocity.y < 0.0 {
+                    tile_y.floor() * 8.0
+                } else {
+                    tile_y.ceil() * 8.0
+                };
+                new.y = c;
+                self.velocity.y = 0.0;
+                break;
+            }
+        }
+        let tiles_x = [
+            ((new.x / 8.0).floor(), (new.y / 8.0).ceil()),
+            ((new.x / 8.0).ceil(), (new.y / 8.0).ceil()),
+            ((new.x / 8.0).ceil(), (new.y / 8.0).floor()),
+            ((new.x / 8.0).floor(), (new.y / 8.0).floor()),
+        ];
+        for (tx, ty) in tiles_x {
             //draw_rectangle(tx.floor() * 8.0, ty.floor() * 8.0, 8.0, 8.0, RED);
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
-                if x_axis {
-                    let c = if self.velocity.x < 0.0 {
-                        tile_x.floor() * 8.0
-                    } else {
-                        tile_x.ceil() * 8.0
-                    };
-                    new.x = c;
-                    self.velocity.x = 0.0;
+                let c = if self.velocity.x < 0.0 {
+                    tile_x.floor() * 8.0
                 } else {
-                    let c = if self.velocity.y < 0.0 {
-                        tile_y.floor() * 8.0
-                    } else {
-                        tile_y.ceil() * 8.0
-                    };
-                    new.y = c;
-                    self.velocity.y = 0.0;
-                    break;
-                }
+                    tile_x.ceil() * 8.0
+                };
+                new.x = c;
+                self.velocity.x = 0.0;
+                break;
             }
         }
 
+        if self.velocity.x.abs() <= 0.3 {
+            self.velocity.x = 0.0;
+        }
         self.pos = new;
     }
     pub fn draw(&self, _assets: &Assets) {
