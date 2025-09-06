@@ -31,9 +31,8 @@ async fn main() {
         let now = time::get_time();
         if now - last > 1.0 / 60.0 {
             last = now;
-            player.update();
+            player.update(&world);
         }
-
         pixel_camera.target = player.pos.floor();
         set_camera(&pixel_camera);
 

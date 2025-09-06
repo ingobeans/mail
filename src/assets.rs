@@ -130,6 +130,11 @@ pub struct World {
     pub details: Vec<Chunk>,
     pub interactable: Vec<Chunk>,
 }
+impl World {
+    pub fn get_collision_chunk(&self, x: i16, y: i16) -> Option<&Chunk> {
+        self.collision.iter().find(|f| f.x == x && f.y == y)
+    }
+}
 impl Default for World {
     fn default() -> Self {
         let xml = include_str!("../assets/tilemap/world.tmx");
@@ -145,11 +150,17 @@ impl Default for World {
 }
 
 pub struct Chunk {
-    x: i16,
-    y: i16,
+    pub x: i16,
+    pub y: i16,
     tiles: Vec<u8>,
 }
 impl Chunk {
+    pub fn tile_at(&self, x: usize, y: usize) -> Option<u8> {
+        if x > 16 {
+            return None;
+        }
+        self.tiles.get(x + y * 16).cloned()
+    }
     pub fn draw(&self, assets: &Assets) {
         for (index, tile) in self.tiles.iter().enumerate() {
             if *tile == 0 {
