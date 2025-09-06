@@ -1,8 +1,9 @@
-use macroquad::{miniquad::window::screen_size, prelude::*};
+use macroquad::{miniquad::window::screen_size, prelude::*, time};
 
-use crate::{assets::*, utils::*};
+use crate::{assets::*, player::*, utils::*};
 
 mod assets;
+mod player;
 mod utils;
 
 fn window_conf() -> Conf {
@@ -18,13 +19,26 @@ async fn main() {
     let assets = Assets::default();
     let mut pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
     let world = World::default();
+    let mut player = Player::new();
+
+    let mut last = time::get_time();
 
     loop {
         let (actual_screen_width, actual_screen_height) = screen_size();
         let scale_factor =
             (actual_screen_width / SCREEN_WIDTH).min(actual_screen_height / SCREEN_HEIGHT);
+
+        let now = time::get_time();
+        if now - last > 1.0 / 60.0 {
+            last = now;
+            player.update();
+        }
+
+        pixel_camera.target = player.pos.floor();
         set_camera(&pixel_camera);
-        clear_background(WHITE);
+
+        clear_background(Color::from_hex(0x588dbe));
+
         for chunk in world.collision.iter() {
             chunk.draw(&assets);
         }
@@ -32,18 +46,9 @@ async fn main() {
             chunk.draw(&assets);
         }
 
-        if is_key_down(KeyCode::A) {
-            pixel_camera.target.x -= 5.0;
-        }
-        if is_key_down(KeyCode::D) {
-            pixel_camera.target.x += 5.0;
-        }
-        if is_key_down(KeyCode::W) {
-            pixel_camera.target.y -= 5.0;
-        }
-        if is_key_down(KeyCode::S) {
-            pixel_camera.target.y += 5.0;
-        }
+        draw_rectangle(pixel_camera.target.x, pixel_camera.target.y, 2.0, 2.0, RED);
+
+        player.draw(&assets);
 
         set_default_camera();
         clear_background(BLACK);

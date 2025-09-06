@@ -85,6 +85,46 @@ impl Spritesheet {
     }
 }
 
+pub struct Animation {
+    frames: Vec<(Texture2D, u32)>,
+    total_length: u32,
+}
+impl Animation {
+    pub fn from_file(bytes: &[u8]) -> Self {
+        let ase = AsepriteFile::read(bytes).unwrap();
+        let mut frames = Vec::new();
+        let mut total_length = 0;
+        for index in 0..ase.num_frames() {
+            let frame = ase.frame(index);
+            let img = frame.image();
+            let new = Image {
+                width: img.width() as u16,
+                height: img.height() as u16,
+                bytes: img.as_bytes().to_vec(),
+            };
+            let duration = frame.duration();
+            total_length += duration;
+            let texture = Texture2D::from_image(&new);
+            frames.push((texture, duration));
+        }
+        Self {
+            frames,
+            total_length,
+        }
+    }
+    pub fn get_at_time(&self, mut time: u32) -> &Texture2D {
+        time %= self.total_length;
+        for (texture, length) in self.frames.iter() {
+            if time > *length {
+                time -= length;
+            } else {
+                return texture;
+            }
+        }
+        panic!()
+    }
+}
+
 pub struct World {
     pub collision: Vec<Chunk>,
     pub details: Vec<Chunk>,
