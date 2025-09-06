@@ -127,6 +127,7 @@ impl Animation {
 
 pub struct World {
     pub collision: Vec<Chunk>,
+    pub one_way_collision: Vec<Chunk>,
     pub details: Vec<Chunk>,
     pub interactable: Vec<Chunk>,
 }
@@ -134,16 +135,21 @@ impl World {
     pub fn get_collision_chunk(&self, x: i16, y: i16) -> Option<&Chunk> {
         self.collision.iter().find(|f| f.x == x && f.y == y)
     }
+    pub fn get_one_way_collision_chunk(&self, x: i16, y: i16) -> Option<&Chunk> {
+        self.one_way_collision.iter().find(|f| f.x == x && f.y == y)
+    }
 }
 impl Default for World {
     fn default() -> Self {
         let xml = include_str!("../assets/tilemap/world.tmx");
-        let collisions = get_layer(xml, "Collision");
-        let details = get_layer(xml, "Detail");
+        let collision = get_layer(xml, "Collision");
+        let one_way_collision = get_layer(xml, "OneWayCollision");
+        let detail = get_layer(xml, "Detail");
         let interactable = get_layer(xml, "Interactable");
         World {
-            collision: get_all_chunks(collisions),
-            details: get_all_chunks(details),
+            collision: get_all_chunks(collision),
+            one_way_collision: get_all_chunks(one_way_collision),
+            details: get_all_chunks(detail),
             interactable: get_all_chunks(interactable),
         }
     }
@@ -152,10 +158,10 @@ impl Default for World {
 pub struct Chunk {
     pub x: i16,
     pub y: i16,
-    tiles: Vec<u8>,
+    pub tiles: Vec<i16>,
 }
 impl Chunk {
-    pub fn tile_at(&self, x: usize, y: usize) -> Option<u8> {
+    pub fn tile_at(&self, x: usize, y: usize) -> Option<i16> {
         if x > 16 {
             return None;
         }
