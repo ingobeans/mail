@@ -103,9 +103,9 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             pos: world.get_interactable_spawn(64).unwrap(),
             draw_condition: &|this, player, _| {
                 (!player.tags.contains(&Tag::HasMail)
-                    || player.tags.contains(&Tag::HenryHasOfferedCarrot))
-                    || player.tags.contains(&Tag::MailHasBeenSent)
-                        && player.pos.distance(this.pos) > 32.0
+                    || player.tags.contains(&Tag::HenryHasOfferedCarrot)
+                    || player.tags.contains(&Tag::MailHasBeenSent))
+                    && player.pos.distance(this.pos) > 32.0
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/poi.ase"
