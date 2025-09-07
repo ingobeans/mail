@@ -1,4 +1,3 @@
-
 use crate::{
     assets::{Animation, Assets, World},
     player::{Player, Tag},
@@ -13,7 +12,7 @@ pub enum DrawType {
 
 pub struct Entity {
     pub pos: Vec2,
-    pub draw_condition: &'static dyn Fn(&Entity, &mut Player) -> bool,
+    pub draw_condition: &'static dyn Fn(&mut Entity, &mut Player) -> bool,
     pub draw_type: DrawType,
     pub lifetime: u32,
 }
@@ -102,6 +101,41 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
                 please go to the town
                 and deliver my mail",
             )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(128).unwrap(),
+            draw_condition: &|this, player| {
+                if player.tags.contains(&Tag::HasInteractedWithTony) {
+                    false
+                } else {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        player.tags.push(Tag::HasInteractedWithTony);
+                    }
+                    true
+                }
+            },
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/poi.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(128).unwrap(),
+            draw_condition: &|this, player| player.pos.distance(this.pos) <= 32.0,
+            draw_type: DrawType::TextBubble(String::from(
+                "hi!
+                feed the bird on my roof
+                and i will let you pass 
+                through here",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(612).unwrap(),
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/bird.ase"
+            ))),
             ..Default::default()
         },
     ]

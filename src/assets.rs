@@ -27,8 +27,7 @@ impl Assets {
     pub fn draw_text(&self, text: &str, mut x: f32, mut y: f32) -> (f32, f32) {
         let original_x = x;
         let original_y = y;
-        let hardcoded =
-            hashmap!(':'=>36,'.'=>37,'-'=>38,'%'=>39,'+'=>40,'/'=>41,'H'=>42,'('=>43,')'=>44);
+        let hardcoded = hashmap!(':'=>36,'.'=>37,'-'=>38,'%'=>39,'+'=>40,'/'=>41,'H'=>42,'('=>43,')'=>44,'!'=>45);
         gl_use_material(&COLOR_MOD_MATERIAL);
         COLOR_MOD_MATERIAL.set_uniform("color", COLORS[1]);
         let mut start_of_line = true;
