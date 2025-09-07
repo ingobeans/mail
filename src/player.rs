@@ -66,7 +66,11 @@ impl Player {
     pub fn update(&mut self, world: &World) {
         self.anim_frame += 1000 / 60;
 
+        // only allow noclip on debug builds
+        #[cfg(debug_assertions)]
         let noclip = is_key_down(KeyCode::LeftShift);
+        #[cfg(not(debug_assertions))]
+        let noclip = { false };
 
         let mut forces = Vec2::ZERO;
 

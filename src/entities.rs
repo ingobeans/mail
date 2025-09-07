@@ -15,7 +15,7 @@ pub struct Entity {
     pub pos: Vec2,
     pub draw_condition: &'static dyn Fn(&mut Entity, &mut Player, &Assets) -> bool,
     pub draw_type: DrawType,
-    pub lifetime: u32,
+    pub anim_frame: u32,
 }
 
 impl Default for Entity {
@@ -24,7 +24,7 @@ impl Default for Entity {
             pos: Vec2::ZERO,
             draw_condition: &|_, _, _| true,
             draw_type: DrawType::None,
-            lifetime: 0,
+            anim_frame: 0,
         }
     }
 }
@@ -35,7 +35,7 @@ impl Entity {
             match &self.draw_type {
                 DrawType::None => {}
                 DrawType::Animation(animation) => {
-                    let texture = animation.get_at_time(self.lifetime);
+                    let texture = animation.get_at_time(self.anim_frame);
                     draw_texture(
                         texture,
                         self.pos.x - texture.width() / 2.0,
@@ -70,7 +70,7 @@ impl Entity {
                     );
                 }
             }
-            self.lifetime += 1000 / 60;
+            self.anim_frame += 1000 / 60;
         }
     }
 }
@@ -154,11 +154,11 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
                 if !player.tags.contains(&Tag::HasReturnedToHenry) {
                     player.tags.push(Tag::HasReturnedToHenry);
                 }
-                if this.lifetime >= 3750 {
+                if this.anim_frame >= 3750 {
                     player.tags.push(Tag::HenryHasOfferedCarrot);
-                    this.lifetime = 3700;
+                    this.anim_frame = 3700;
                 }
-                (player.pos.distance(this.pos) <= 32.0 || this.lifetime > 0)
+                (player.pos.distance(this.pos) <= 32.0 || this.anim_frame > 0)
                     && player.tags.contains(&Tag::MailHasBeenSent)
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
@@ -322,7 +322,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(288).unwrap() + Vec2::new(0.0, 20.0),
             draw_condition: &|this, player, _| {
-                if this.lifetime > 650 {
+                if this.anim_frame > 650 {
                     player.tags.push(Tag::MailHasBeenSent);
                 }
                 player.tags.contains(&Tag::HasGivenGift)
