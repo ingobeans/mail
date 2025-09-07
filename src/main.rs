@@ -159,18 +159,16 @@ async fn main() {
 
             if started {
                 player.draw(&assets);
-            } else {
-                if draw_button(
-                    &assets.start_button,
-                    &assets.start_button_hovered,
-                    102.0 + player.camera_pos.x - SCREEN_WIDTH / 2.0,
-                    68.0 + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
-                    mouse_x + player.camera_pos.x - SCREEN_WIDTH / 2.0,
-                    mouse_y + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
-                    false,
-                ) {
-                    player.tags.push(Tag::GameStarted);
-                }
+            } else if draw_button(
+                &assets.start_button,
+                &assets.start_button_hovered,
+                102.0 + player.camera_pos.x - SCREEN_WIDTH / 2.0,
+                68.0 + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
+                mouse_x + player.camera_pos.x - SCREEN_WIDTH / 2.0,
+                mouse_y + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
+                false,
+            ) {
+                player.tags.push(Tag::GameStarted);
             }
         }
 

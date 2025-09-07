@@ -207,12 +207,6 @@ impl Player {
             .filter(|f| chunks_pos.contains(&(f.x, f.y)))
             .collect();
 
-        let one_way_chunks: Vec<&Chunk> = world
-            .collision
-            .iter()
-            .filter(|f| chunks_pos.contains(&(f.x, f.y)))
-            .collect();
-
         for (tx, ty) in tiles_x {
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
