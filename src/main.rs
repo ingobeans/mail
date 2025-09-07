@@ -29,6 +29,7 @@ async fn main() {
     let mut player = Player::new();
 
     player.pos = Vec2::new(-6.0 * 8.0, 2.0 * 8.0 - 20.0 * 8.0);
+    player.camera_pos.x = player.pos.x;
     player.facing_right = false;
 
     let mut last = time::get_time();
@@ -43,26 +44,7 @@ async fn main() {
         let mouse_x = mouse_x / scale_factor;
         let mouse_y = mouse_y / scale_factor;
 
-        if !player.tags.contains(&Tag::GameStarted) {
-            // handle menu screen
-            pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
-            set_camera(&pixel_camera);
-            // draw background
-            clear_background(Color::from_hex(0x422433));
-            draw_texture(&assets.menu_screen, 0.0, 0.0, WHITE);
-            if draw_button(
-                &assets.start_button,
-                &assets.start_button_hovered,
-                102.0,
-                68.0,
-                mouse_x,
-                mouse_y,
-                false,
-            ) {
-                player.tags.push(Tag::GameStarted);
-                pixel_camera.target.y = 2.0 * 8.0 - 2.0 * 8.0;
-            }
-        } else if player.tags.contains(&Tag::HasCarrot) {
+        if player.tags.contains(&Tag::HasCarrot) {
             // handle win screen
             pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
             set_camera(&pixel_camera);
@@ -140,10 +122,13 @@ async fn main() {
         } else {
             // draw game!
             let now = time::get_time();
+            let started = player.tags.contains(&Tag::GameStarted);
 
             if now - last > 1.0 / 60.0 {
                 last = now;
-                player.update(&world);
+                if started {
+                    player.update(&world);
+                }
             }
             pixel_camera.target = player.camera_pos;
             set_camera(&pixel_camera);
@@ -172,7 +157,21 @@ async fn main() {
                 world.set_collision_tile(79, 2, 0);
             }
 
-            player.draw(&assets);
+            if started {
+                player.draw(&assets);
+            } else {
+                if draw_button(
+                    &assets.start_button,
+                    &assets.start_button_hovered,
+                    102.0 + player.camera_pos.x - SCREEN_WIDTH / 2.0,
+                    68.0 + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
+                    mouse_x + player.camera_pos.x - SCREEN_WIDTH / 2.0,
+                    mouse_y + player.camera_pos.y - SCREEN_HEIGHT / 2.0,
+                    false,
+                ) {
+                    player.tags.push(Tag::GameStarted);
+                }
+            }
         }
 
         set_default_camera();

@@ -235,7 +235,7 @@ impl Player {
         self.camera_pos.x = self.pos.x.floor();
         let delta = self.camera_pos.y - self.pos.y.floor();
         let max_delta = 3.0 * 8.0;
-        if delta.abs() >= max_delta {
+        if can_move && delta.abs() >= max_delta {
             self.camera_pos.y =
                 max_delta * if delta < 0.0 { -1.0 } else { 1.0 } + self.pos.y.floor();
         }
