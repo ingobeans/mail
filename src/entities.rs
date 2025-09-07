@@ -233,5 +233,135 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             ))),
             ..Default::default()
         },
+        Entity {
+            pos: world.get_interactable_spawn(288).unwrap(),
+            draw_condition: &|this, player, _| {
+                player.tags.contains(&Tag::TonyHasOpenedDoor)
+                    && !player.tags.contains(&Tag::HasGift)
+                    && player.pos.distance(this.pos) > 32.0
+            },
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/poi.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(288).unwrap(),
+            draw_condition: &|this, player, assets| {
+                if player.tags.contains(&Tag::HasMail) && !player.tags.contains(&Tag::HasGivenGift)
+                {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        if player.tags.contains(&Tag::HasGift) {
+                            show_tooltip("e: give gift", Tag::HasGivenGift, assets, player);
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "today is my birthday.
+                want to send mail?
+                get me a gift!",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(288).unwrap() + Vec2::new(0.0, 20.0),
+            draw_condition: &|this, player, _| {
+                if this.lifetime > 650 {
+                    player.tags.push(Tag::MailHasBeenSent);
+                }
+                player.tags.contains(&Tag::HasGivenGift)
+                    && !player.tags.contains(&Tag::MailHasBeenSent)
+            },
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/birthday_happy.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(288).unwrap(),
+            draw_condition: &|this, player, _| {
+                if player.tags.contains(&Tag::MailHasBeenSent) {
+                    player.pos.distance(this.pos) <= 32.0
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "thanks for the gift!
+                ive sent your mail now",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(384).unwrap(),
+            draw_condition: &|this, player, _| {
+                !player.tags.contains(&Tag::HasGift) && player.pos.distance(this.pos) > 32.0
+            },
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/poi.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(384).unwrap(),
+            draw_condition: &|this, player, _| {
+                if !player.tags.contains(&Tag::HasMilk) {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        player.tags.push(Tag::HasBeeninGiftStore);
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "buy me some milk from
+                tonys grocery and i will
+                give you a gift to give",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(384).unwrap(),
+            draw_condition: &|this, player, assets| {
+                if player.tags.contains(&Tag::HasMilk)
+                    && !player.tags.contains(&Tag::HasGift)
+                    && player.pos.distance(this.pos) <= 32.0
+                {
+                    show_tooltip("e: give milk", Tag::HasGift, assets, player);
+                }
+                false
+            },
+            draw_type: DrawType::None,
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(128).unwrap(),
+            draw_condition: &|this, player, assets| {
+                if player.tags.contains(&Tag::HasBeeninGiftStore)
+                    && !player.tags.contains(&Tag::HasMilk)
+                    && player.pos.distance(this.pos) <= 32.0
+                {
+                    show_tooltip("e: accept milk", Tag::HasMilk, assets, player);
+                    true
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "here! have some milk
+                as thanks for feeding
+                my bird",
+            )),
+            ..Default::default()
+        },
     ]
 }

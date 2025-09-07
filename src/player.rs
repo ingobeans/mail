@@ -23,6 +23,11 @@ pub enum Tag {
     HasBirdFood,
     HasFedBird,
     TonyHasOpenedDoor,
+    HasGift,
+    HasGivenGift,
+    MailHasBeenSent,
+    HasBeeninGiftStore,
+    HasMilk,
 }
 
 pub struct Player {
