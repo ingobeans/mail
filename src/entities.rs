@@ -348,7 +348,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             },
             draw_type: DrawType::TextBubble(String::from(
                 "thanks for the gift!
-                ive sent your mail now",
+                i have sent your mail",
             )),
             ..Default::default()
         },
