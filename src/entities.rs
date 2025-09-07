@@ -216,7 +216,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             draw_condition: &|this, player, assets| {
                 if player.tags.contains(&Tag::HasBirdFood)
                     && !player.tags.contains(&Tag::HasFedBird)
-                    && player.pos.distance(this.pos) <= 32.0
+                    && player.pos.distance(this.pos) <= 8.0
                 {
                     show_tooltip("e: feed bird", Tag::HasFedBird, assets, player);
                 }
