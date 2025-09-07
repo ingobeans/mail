@@ -40,7 +40,6 @@ pub struct Player {
     pub anim_frame: u32,
     pub facing_right: bool,
     pub on_ground: bool,
-    pub debug_tiles: Vec<(f32, f32, f32, f32, Color)>,
     pub jump_frames: u8,
     pub tags: Vec<Tag>,
     idle_animation: Animation,
@@ -55,7 +54,6 @@ impl Player {
             jump_frames: 0,
             facing_right: true,
             on_ground: false,
-            debug_tiles: Vec::new(),
             tags: Vec::new(),
             idle_animation: Animation::from_file(include_bytes!(
                 "../assets/entities/player/idle.ase"
@@ -66,7 +64,6 @@ impl Player {
         }
     }
     pub fn update(&mut self, world: &World) {
-        self.debug_tiles = Vec::new();
         self.anim_frame += 1000 / 60;
 
         let noclip = is_key_down(KeyCode::LeftShift);
@@ -143,13 +140,6 @@ impl Player {
                 && let Some(chunk) = world.get_collision_chunk(cx, cy)
             {
                 chunks.push(chunk);
-                self.debug_tiles.push((
-                    cx as f32 * 8.0,
-                    cy as f32 * 8.0,
-                    16.0 * 8.0,
-                    16.0 * 8.0,
-                    Color::from_rgba(255, 0, 255, 125),
-                ));
             }
             if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
                 && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy)
@@ -162,8 +152,6 @@ impl Player {
         for (tx, ty) in tiles_y {
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
-                self.debug_tiles
-                    .push((tx.trunc() * 8.0, ty.trunc() * 8.0, 8.0, 8.0, RED));
                 let c = if self.velocity.y < 0.0 {
                     tile_y.floor() * 8.0
                 } else {
@@ -181,19 +169,11 @@ impl Player {
                 && get_tile(&one_way_chunks, tx as i16, ty as i16) != 0
             {
                 new.y = tile_y.ceil() * 8.0;
-                self.debug_tiles
-                    .push((tx.trunc() * 8.0, ty.trunc() * 8.0, 8.0, 8.0, YELLOW));
                 self.velocity.y = 0.0;
                 self.on_ground = true;
                 break;
             }
         }
-        self.debug_tiles
-            .push((tile_x.floor() * 8.0, tile_y.floor() * 8.0, 1.0, 1.0, LIME));
-        self.debug_tiles
-            .push((tile_x.ceil() * 8.0, tile_y.floor() * 8.0, 1.0, 1.0, GREEN));
-        self.debug_tiles
-            .push((tile_x * 8.0, tile_y * 8.0, 1.0, 1.0, GOLD));
         let tiles_x = [
             ((new.x / 8.0).trunc(), ceil_g(new.y / 8.0)),
             (ceil_g(new.x / 8.0), ceil_g(new.y / 8.0)),
@@ -208,13 +188,6 @@ impl Player {
                 && let Some(chunk) = world.get_collision_chunk(cx, cy)
             {
                 chunks.push(chunk);
-                self.debug_tiles.push((
-                    cx as f32 * 8.0,
-                    cy as f32 * 8.0,
-                    16.0 * 8.0,
-                    16.0 * 8.0,
-                    Color::from_rgba(255, 0, 255, 125),
-                ));
             }
             if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
                 && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy)
@@ -223,13 +196,6 @@ impl Player {
             }
         }
         for (tx, ty) in tiles_x {
-            self.debug_tiles.push((
-                tx.trunc() * 8.0,
-                ty.trunc() * 8.0,
-                8.0,
-                8.0,
-                BEIGE.with_alpha(0.2),
-            ));
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
                 let c = if self.velocity.x < 0.0 {
@@ -237,8 +203,6 @@ impl Player {
                 } else {
                     tile_x.ceil() * 8.0
                 };
-                self.debug_tiles
-                    .push((tx.trunc() * 8.0, ty.trunc() * 8.0, 8.0, 8.0, BLUE));
                 new.x = c;
                 self.velocity.x = 0.0;
                 break;
@@ -267,10 +231,5 @@ impl Player {
                 ..Default::default()
             },
         );
-        if *IS_DEBUG.lock().unwrap() {
-            for (x, y, w, h, color) in self.debug_tiles.iter() {
-                draw_rectangle(*x, *y, *w, *h, *color);
-            }
-        }
     }
 }
