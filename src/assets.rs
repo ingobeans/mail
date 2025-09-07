@@ -258,17 +258,12 @@ impl Chunk {
 }
 
 fn get_all_chunks(xml: &str) -> Vec<Chunk> {
-    let count = xml.lines().filter(|f| *f == "</chunk>").count();
     let mut chunks = Vec::new();
     let mut xml = xml.to_string();
-    loop {
-        if let Some((current, remains)) = xml.split_once("</chunk>") {
-            let new = parse_chunk(current);
-            chunks.push(new);
-            xml = remains.to_string();
-        } else {
-            break;
-        }
+    while let Some((current, remains)) = xml.split_once("</chunk>") {
+        let new = parse_chunk(current);
+        chunks.push(new);
+        xml = remains.to_string();
     }
 
     chunks

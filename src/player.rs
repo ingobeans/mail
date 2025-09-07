@@ -125,10 +125,10 @@ impl Player {
         let mut one_way_chunks: Vec<&Chunk> = Vec::new();
 
         for tile in tiles_y.iter() {
-            let cx = ((tile.0 as f32 / 16.0).floor() * 16.0) as i16;
-            let cy = ((tile.1 as f32 / 16.0).floor() * 16.0) as i16;
-            if !chunks.iter().any(|f| f.x == cx && f.y == cy) {
-                if let Some(chunk) = world.get_collision_chunk(cx, cy) {
+            let cx = ((tile.0 / 16.0).floor() * 16.0) as i16;
+            let cy = ((tile.1 / 16.0).floor() * 16.0) as i16;
+            if !chunks.iter().any(|f| f.x == cx && f.y == cy)
+                && let Some(chunk) = world.get_collision_chunk(cx, cy) {
                     chunks.push(chunk);
                     self.debug_tiles.push((
                         cx as f32 * 8.0,
@@ -138,12 +138,10 @@ impl Player {
                         Color::from_rgba(255, 0, 255, 125),
                     ));
                 }
-            }
-            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy) {
-                if let Some(chunk) = world.get_one_way_collision_chunk(cx, cy) {
+            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
+                && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy) {
                     one_way_chunks.push(chunk);
                 }
-            }
         }
 
         self.on_ground = false;
@@ -164,8 +162,8 @@ impl Player {
             }
 
             // handle single way platforms
-            if self.velocity.y > 0.0 && ty.trunc() > tile_y.trunc() {
-                if get_tile(&one_way_chunks, tx as i16, ty as i16) != 0 {
+            if self.velocity.y > 0.0 && ty.trunc() > tile_y.trunc()
+                && get_tile(&one_way_chunks, tx as i16, ty as i16) != 0 {
                     new.y = tile_y.ceil() * 8.0;
                     self.debug_tiles
                         .push((tx.trunc() * 8.0, ty.trunc() * 8.0, 8.0, 8.0, YELLOW));
@@ -173,7 +171,6 @@ impl Player {
                     self.on_ground = true;
                     break;
                 }
-            }
         }
         self.debug_tiles
             .push((tile_x.floor() * 8.0, tile_y.floor() * 8.0, 1.0, 1.0, LIME));
@@ -189,10 +186,10 @@ impl Player {
         ];
 
         for tile in tiles_x.iter() {
-            let cx = ((tile.0 as f32 / 16.0).floor() * 16.0) as i16;
-            let cy = ((tile.1 as f32 / 16.0).floor() * 16.0) as i16;
-            if !chunks.iter().any(|f| f.x == cx && f.y == cy) {
-                if let Some(chunk) = world.get_collision_chunk(cx, cy) {
+            let cx = ((tile.0 / 16.0).floor() * 16.0) as i16;
+            let cy = ((tile.1 / 16.0).floor() * 16.0) as i16;
+            if !chunks.iter().any(|f| f.x == cx && f.y == cy)
+                && let Some(chunk) = world.get_collision_chunk(cx, cy) {
                     chunks.push(chunk);
                     self.debug_tiles.push((
                         cx as f32 * 8.0,
@@ -202,12 +199,10 @@ impl Player {
                         Color::from_rgba(255, 0, 255, 125),
                     ));
                 }
-            }
-            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy) {
-                if let Some(chunk) = world.get_one_way_collision_chunk(cx, cy) {
+            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
+                && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy) {
                     one_way_chunks.push(chunk);
                 }
-            }
         }
         for (tx, ty) in tiles_x {
             self.debug_tiles.push((

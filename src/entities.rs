@@ -1,4 +1,3 @@
-use std::sync::atomic::{AtomicU8, Ordering};
 
 use crate::{
     assets::{Animation, Assets, World},
@@ -65,7 +64,7 @@ impl Entity {
                         WHITE,
                     );
                     assets.draw_text(
-                        &text,
+                        text,
                         self.pos.x + padding,
                         self.pos.y + padding - vertical_offset,
                     );
