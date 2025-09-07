@@ -290,6 +290,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             pos: world.get_interactable_spawn(288).unwrap(),
             draw_condition: &|this, player, _| {
                 player.tags.contains(&Tag::TonyHasOpenedDoor)
+                    && player.tags.contains(&Tag::HasMail)
                     && !player.tags.contains(&Tag::HasGivenGift)
                     && player.pos.distance(this.pos) > 32.0
             },

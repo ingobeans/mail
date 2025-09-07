@@ -144,23 +144,23 @@ impl Player {
             (ceil_g(tile_x), (new.y / 8.0).trunc()),
         ];
 
-        let mut chunks: Vec<&Chunk> = Vec::new();
-        let mut one_way_chunks: Vec<&Chunk> = Vec::new();
+        let chunks_pos: [(i16, i16); 4] = std::array::from_fn(|f| {
+            let cx = ((tiles_y[f].0 / 16.0).floor() * 16.0) as i16;
+            let cy = ((tiles_y[f].1 / 16.0).floor() * 16.0) as i16;
+            (cx, cy)
+        });
 
-        for tile in tiles_y.iter() {
-            let cx = ((tile.0 / 16.0).floor() * 16.0) as i16;
-            let cy = ((tile.1 / 16.0).floor() * 16.0) as i16;
-            if !chunks.iter().any(|f| f.x == cx && f.y == cy)
-                && let Some(chunk) = world.get_collision_chunk(cx, cy)
-            {
-                chunks.push(chunk);
-            }
-            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
-                && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy)
-            {
-                one_way_chunks.push(chunk);
-            }
-        }
+        let chunks: Vec<&Chunk> = world
+            .collision
+            .iter()
+            .filter(|f| chunks_pos.contains(&(f.x, f.y)))
+            .collect();
+
+        let one_way_chunks: Vec<&Chunk> = world
+            .one_way_collision
+            .iter()
+            .filter(|f| chunks_pos.contains(&(f.x, f.y)))
+            .collect();
 
         self.on_ground = false;
         for (tx, ty) in tiles_y {
@@ -195,20 +195,24 @@ impl Player {
             ((new.x / 8.0).trunc(), (new.y / 8.0).trunc()),
         ];
 
-        for tile in tiles_x.iter() {
-            let cx = ((tile.0 / 16.0).floor() * 16.0) as i16;
-            let cy = ((tile.1 / 16.0).floor() * 16.0) as i16;
-            if !chunks.iter().any(|f| f.x == cx && f.y == cy)
-                && let Some(chunk) = world.get_collision_chunk(cx, cy)
-            {
-                chunks.push(chunk);
-            }
-            if !one_way_chunks.iter().any(|f| f.x == cx && f.y == cy)
-                && let Some(chunk) = world.get_one_way_collision_chunk(cx, cy)
-            {
-                one_way_chunks.push(chunk);
-            }
-        }
+        let chunks_pos: [(i16, i16); 4] = std::array::from_fn(|f| {
+            let cx = ((tiles_x[f].0 / 16.0).floor() * 16.0) as i16;
+            let cy = ((tiles_x[f].1 / 16.0).floor() * 16.0) as i16;
+            (cx, cy)
+        });
+
+        let chunks: Vec<&Chunk> = world
+            .collision
+            .iter()
+            .filter(|f| chunks_pos.contains(&(f.x, f.y)))
+            .collect();
+
+        let one_way_chunks: Vec<&Chunk> = world
+            .collision
+            .iter()
+            .filter(|f| chunks_pos.contains(&(f.x, f.y)))
+            .collect();
+
         for (tx, ty) in tiles_x {
             let tile = get_tile(&chunks, tx as i16, ty as i16);
             if tile != 0 {
