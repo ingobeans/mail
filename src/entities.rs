@@ -81,8 +81,8 @@ pub fn show_tooltip(text: &str, grants_tag: Tag, assets: &Assets, player: &mut P
 
     let width = text.len() as f32 * 4.0 + padding * 2.0;
     let height = 5.0 + padding * 2.0;
-    let x = (player.pos.x - width / 2.0 + 4.0).floor();
-    let y = (player.pos.y - height - margin + SCREEN_HEIGHT / 2.0).floor();
+    let x = (player.camera_pos.x - width / 2.0 + 4.0).floor();
+    let y = (player.camera_pos.y - height - margin + SCREEN_HEIGHT / 2.0).floor();
     draw_rectangle(x, y, width, height, Color::from_hex(0x3b1725));
     draw_rectangle(
         x + 1.0,
@@ -243,7 +243,10 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(128).unwrap(),
             draw_condition: &|this, player, _| {
-                if player.tags.contains(&Tag::HasFedBird) && player.pos.distance(this.pos) <= 32.0 {
+                if !player.tags.contains(&Tag::HasMilk)
+                    && player.tags.contains(&Tag::HasFedBird)
+                    && player.pos.distance(this.pos) <= 32.0
+                {
                     player.tags.push(Tag::TonyHasOpenedDoor);
                     true
                 } else {

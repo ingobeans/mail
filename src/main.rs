@@ -60,6 +60,7 @@ async fn main() {
                 false,
             ) {
                 player.tags.push(Tag::GameStarted);
+                pixel_camera.target.y = 2.0 * 8.0 - 2.0 * 8.0;
             }
         } else if player.tags.contains(&Tag::HasCarrot) {
             // handle win screen
@@ -130,20 +131,21 @@ async fn main() {
                 WHITE,
             );
 
-            // temporarily move player because the `show_tooltip` function is relative to player pos
+            // temporarily move camera because the `show_tooltip` function is relative to camera
             // but since this menu has a fixed pos camera, this needs to be disabled
             let mut old = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
-            (player.pos, old) = (old, player.pos);
+            (player.camera_pos, old) = (old, player.camera_pos);
             show_tooltip("e: select this gift", Tag::HasGift, &assets, &mut player);
-            player.pos = old;
+            player.camera_pos = old;
         } else {
+            // draw game!
             let now = time::get_time();
 
             if now - last > 1.0 / 60.0 {
                 last = now;
                 player.update(&world);
             }
-            pixel_camera.target = player.pos.floor();
+            pixel_camera.target = player.camera_pos;
             set_camera(&pixel_camera);
 
             clear_background(Color::from_hex(0x249fde));

@@ -38,6 +38,7 @@ pub enum Tag {
 
 pub struct Player {
     pub pos: Vec2,
+    pub camera_pos: Vec2,
     pub velocity: Vec2,
     pub anim_frame: u32,
     pub facing_right: bool,
@@ -51,6 +52,7 @@ impl Player {
     pub fn new() -> Self {
         Self {
             pos: Vec2::ZERO,
+            camera_pos: Vec2::ZERO,
             velocity: Vec2::ZERO,
             anim_frame: 0,
             jump_frames: 0,
@@ -117,6 +119,7 @@ impl Player {
             self.velocity = self.velocity.lerp(Vec2::ZERO, GROUND_FRICTION);
 
             self.pos += self.velocity;
+            self.camera_pos = self.pos.floor();
             return;
         }
 
@@ -228,6 +231,13 @@ impl Player {
 
         if self.pos.y >= 2.0 * 8.0 && !can_move {
             self.tags.push(Tag::StartAnimationFinished);
+        }
+        self.camera_pos.x = self.pos.x.floor();
+        let delta = self.camera_pos.y - self.pos.y.floor();
+        let max_delta = 3.0 * 8.0;
+        if delta.abs() >= max_delta {
+            self.camera_pos.y =
+                max_delta * if delta < 0.0 { -1.0 } else { 1.0 } + self.pos.y.floor();
         }
     }
     pub fn draw(&self, _assets: &Assets) {
