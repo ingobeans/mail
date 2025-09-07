@@ -1,6 +1,7 @@
 use crate::{
     assets::{Animation, Assets, World},
     player::{Player, Tag},
+    utils::*,
 };
 use macroquad::prelude::*;
 
@@ -12,7 +13,7 @@ pub enum DrawType {
 
 pub struct Entity {
     pub pos: Vec2,
-    pub draw_condition: &'static dyn Fn(&mut Entity, &mut Player) -> bool,
+    pub draw_condition: &'static dyn Fn(&mut Entity, &mut Player, &Assets) -> bool,
     pub draw_type: DrawType,
     pub lifetime: u32,
 }
@@ -21,7 +22,7 @@ impl Default for Entity {
     fn default() -> Self {
         Entity {
             pos: Vec2::ZERO,
-            draw_condition: &|_, _| true,
+            draw_condition: &|_, _, _| true,
             draw_type: DrawType::None,
             lifetime: 0,
         }
@@ -30,7 +31,7 @@ impl Default for Entity {
 
 impl Entity {
     pub fn draw(&mut self, player: &mut Player, assets: &Assets) {
-        if (self.draw_condition)(self, player) {
+        if (self.draw_condition)(self, player, assets) {
             match &self.draw_type {
                 DrawType::None => {}
                 DrawType::Animation(animation) => {
@@ -74,19 +75,34 @@ impl Entity {
     }
 }
 
+fn show_tooltip(text: &str, grants_tag: Tag, assets: &Assets, player: &mut Player) {
+    let padding = 2.0;
+    let margin = 2.0;
+
+    let width = text.len() as f32 * 4.0 + padding * 2.0;
+    let height = 5.0 + padding * 2.0;
+    let x = (player.pos.x - width / 2.0 + 4.0).floor();
+    let y = (player.pos.y - height - margin + SCREEN_HEIGHT / 2.0).floor();
+    draw_rectangle(x, y, width, height, Color::from_hex(0x3b1725));
+    draw_rectangle(
+        x + 1.0,
+        y + 1.0,
+        width - 2.0,
+        height - 2.0,
+        Color::from_hex(0xfffc40),
+    );
+    assets.draw_text(text, x + padding, y + padding);
+    if is_key_pressed(KeyCode::E) {
+        player.tags.push(grants_tag);
+    }
+}
+
 pub fn get_entities(world: &World) -> Vec<Entity> {
     vec![
         Entity {
             pos: world.get_interactable_spawn(64).unwrap(),
-            draw_condition: &|this, player| {
-                if player.tags.contains(&Tag::HasInteractedWithHenry) {
-                    false
-                } else {
-                    if player.pos.distance(this.pos) <= 32.0 {
-                        player.tags.push(Tag::HasInteractedWithHenry);
-                    }
-                    true
-                }
+            draw_condition: &|this, player, _| {
+                !player.tags.contains(&Tag::HasMail) && player.pos.distance(this.pos) > 32.0
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/poi.ase"
@@ -95,7 +111,20 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         },
         Entity {
             pos: world.get_interactable_spawn(64).unwrap(),
-            draw_condition: &|this, player| player.pos.distance(this.pos) <= 32.0,
+            draw_condition: &|this, player, assets| {
+                if !player.tags.contains(&Tag::HasMail) {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        if player.pos.distance(this.pos) <= 32.0 {
+                            show_tooltip("e: take mail", Tag::HasMail, assets, player);
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
             draw_type: DrawType::TextBubble(String::from(
                 "hi!
                 please go to the town
@@ -104,16 +133,20 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             ..Default::default()
         },
         Entity {
+            pos: world.get_interactable_spawn(64).unwrap(),
+            draw_condition: &|this, player, _| {
+                player.pos.distance(this.pos) <= 32.0 && player.tags.contains(&Tag::HasMail)
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "thanks! return when
+                you have delivered it",
+            )),
+            ..Default::default()
+        },
+        Entity {
             pos: world.get_interactable_spawn(128).unwrap(),
-            draw_condition: &|this, player| {
-                if player.tags.contains(&Tag::HasInteractedWithTony) {
-                    false
-                } else {
-                    if player.pos.distance(this.pos) <= 32.0 {
-                        player.tags.push(Tag::HasInteractedWithTony);
-                    }
-                    true
-                }
+            draw_condition: &|this, player, _| {
+                !player.tags.contains(&Tag::HasBirdFood) && player.pos.distance(this.pos) > 32.0
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/poi.ase"
@@ -122,12 +155,36 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         },
         Entity {
             pos: world.get_interactable_spawn(128).unwrap(),
-            draw_condition: &|this, player| player.pos.distance(this.pos) <= 32.0,
+            draw_condition: &|this, player, assets| {
+                if !player.tags.contains(&Tag::HasBirdFood) {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        if player.pos.distance(this.pos) <= 32.0 {
+                            show_tooltip("e: take bird food", Tag::HasBirdFood, assets, player);
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
             draw_type: DrawType::TextBubble(String::from(
                 "hi!
                 feed the bird on my roof
                 and i will let you pass 
                 through here",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(128).unwrap(),
+            draw_condition: &|this, player, _| {
+                player.tags.contains(&Tag::HasBirdFood) && player.pos.distance(this.pos) <= 32.0
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "return when youve fed
+                the bird on my roof",
             )),
             ..Default::default()
         },

@@ -19,8 +19,8 @@ fn ceil_g(a: f32) -> f32 {
 
 #[derive(PartialEq)]
 pub enum Tag {
-    HasInteractedWithHenry,
-    HasInteractedWithTony,
+    HasMail,
+    HasBirdFood,
 }
 
 pub struct Player {
