@@ -128,7 +128,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             draw_type: DrawType::TextBubble(String::from(
                 "hi!
                 please go to the town
-                and deliver my mail",
+                and post my mail",
             )),
             ..Default::default()
         },
@@ -139,7 +139,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             },
             draw_type: DrawType::TextBubble(String::from(
                 "thanks! return when
-                you have delivered it",
+                you have posted it",
             )),
             ..Default::default()
         },
