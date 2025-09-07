@@ -28,6 +28,7 @@ pub enum Tag {
     MailHasBeenSent,
     HasBeeninGiftStore,
     HasMilk,
+    SelectingGift,
 }
 
 pub struct Player {

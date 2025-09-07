@@ -75,7 +75,7 @@ impl Entity {
     }
 }
 
-fn show_tooltip(text: &str, grants_tag: Tag, assets: &Assets, player: &mut Player) {
+pub fn show_tooltip(text: &str, grants_tag: Tag, assets: &Assets, player: &mut Player) {
     let padding = 2.0;
     let margin = 2.0;
 
@@ -331,12 +331,23 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         },
         Entity {
             pos: world.get_interactable_spawn(384).unwrap(),
+            draw_condition: &|this, player, _| {
+                player.tags.contains(&Tag::HasGift) && player.pos.distance(this.pos) <= 32.0
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "pleasure doin business
+                with you!",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(384).unwrap(),
             draw_condition: &|this, player, assets| {
                 if player.tags.contains(&Tag::HasMilk)
                     && !player.tags.contains(&Tag::HasGift)
                     && player.pos.distance(this.pos) <= 32.0
                 {
-                    show_tooltip("e: give milk", Tag::HasGift, assets, player);
+                    show_tooltip("e: give milk", Tag::SelectingGift, assets, player);
                 }
                 false
             },

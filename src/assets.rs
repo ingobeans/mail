@@ -7,6 +7,10 @@ use crate::utils::*;
 
 pub struct Assets {
     pub tileset: Spritesheet,
+    pub gift_selection_screen: Texture2D,
+    pub gift_sprites: Animation,
+    pub arrow: Texture2D,
+    pub arrow_hovered: Texture2D,
     pub font: Spritesheet,
 }
 impl Default for Assets {
@@ -16,6 +20,13 @@ impl Default for Assets {
                 load_ase_texture(include_bytes!("../assets/tileset.ase"), None),
                 8.0,
             ),
+            gift_selection_screen: load_ase_texture(
+                include_bytes!("../assets/gift_selection_screen.ase"),
+                None,
+            ),
+            arrow: load_ase_texture(include_bytes!("../assets/arrow.ase"), None),
+            arrow_hovered: load_ase_texture(include_bytes!("../assets/arrow_hovered.ase"), None),
+            gift_sprites: Animation::from_file(include_bytes!("../assets/gifts.ase")),
             font: Spritesheet::new(
                 load_ase_texture(include_bytes!("../assets/font.ase"), None),
                 4.0,
@@ -29,7 +40,7 @@ impl Assets {
         let original_y = y;
         let hardcoded = hashmap!(':'=>36,'.'=>37,'-'=>38,'%'=>39,'+'=>40,'/'=>41,'H'=>42,'('=>43,')'=>44,'!'=>45,'?'=>46);
         gl_use_material(&COLOR_MOD_MATERIAL);
-        COLOR_MOD_MATERIAL.set_uniform("color", COLORS[1]);
+        COLOR_MOD_MATERIAL.set_uniform("color", TEXT_COLORS[1]);
         let mut start_of_line = true;
 
         for char in text.chars() {
@@ -46,8 +57,8 @@ impl Assets {
                 continue;
             }
             let code = char as u8;
-            if code < COLORS.len() as u8 {
-                COLOR_MOD_MATERIAL.set_uniform("color", COLORS[code as usize]);
+            if code < TEXT_COLORS.len() as u8 {
+                COLOR_MOD_MATERIAL.set_uniform("color", TEXT_COLORS[code as usize]);
             }
 
             let index = if let Some(value) = hardcoded.get(&char) {
@@ -66,7 +77,7 @@ impl Assets {
             x += 4.0
         }
 
-        COLOR_MOD_MATERIAL.set_uniform("color", COLORS[0]);
+        COLOR_MOD_MATERIAL.set_uniform("color", TEXT_COLORS[0]);
         gl_use_default_material();
         (x - original_x, y - original_y)
     }
@@ -141,7 +152,7 @@ impl Spritesheet {
 
 pub struct Animation {
     frames: Vec<(Texture2D, u32)>,
-    total_length: u32,
+    pub total_length: u32,
 }
 impl Animation {
     pub fn from_file(bytes: &[u8]) -> Self {
@@ -169,7 +180,7 @@ impl Animation {
     pub fn get_at_time(&self, mut time: u32) -> &Texture2D {
         time %= self.total_length;
         for (texture, length) in self.frames.iter() {
-            if time > *length {
+            if time >= *length {
                 time -= length;
             } else {
                 return texture;

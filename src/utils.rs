@@ -18,7 +18,7 @@ pub static IS_DEBUG: Mutex<bool> = Mutex::new(false);
 pub fn create_camera(w: f32, h: f32) -> Camera2D {
     let rt = render_target(w as u32, h as u32);
     rt.texture.set_filter(FilterMode::Nearest);
-    
+
     Camera2D {
         render_target: Some(rt),
         zoom: Vec2::new(1.0 / w * 2.0, 1.0 / h * 2.0),
@@ -26,7 +26,34 @@ pub fn create_camera(w: f32, h: f32) -> Camera2D {
     }
 }
 
-pub static COLORS: &[Vec4] = &[
+pub fn draw_button(
+    texture: &Texture2D,
+    texture_hovered: &Texture2D,
+    x: f32,
+    y: f32,
+    mouse_x: f32,
+    mouse_y: f32,
+    flipped: bool,
+) -> bool {
+    let params = DrawTextureParams {
+        flip_x: flipped,
+        ..Default::default()
+    };
+    let hovered =
+        (x..x + texture.width()).contains(&mouse_x) && (y..y + texture.height()).contains(&mouse_y);
+
+    draw_texture_ex(
+        if hovered { texture_hovered } else { texture },
+        x,
+        y,
+        WHITE,
+        params,
+    );
+
+    hovered && is_mouse_button_pressed(MouseButton::Left)
+}
+
+pub static TEXT_COLORS: &[Vec4] = &[
     Vec4::new(1.0, 1.0, 1.0, 1.0),
     Vec4::new(0.0, 0.0, 0.0, 1.0),
     Color::from_hex(0xda2424).to_vec(),
@@ -62,7 +89,7 @@ pub static COLOR_MOD_MATERIAL: LazyLock<Material> = LazyLock::new(|| {
         },
     )
     .unwrap();
-    m.set_uniform("color", COLORS[0]);
+    m.set_uniform("color", TEXT_COLORS[0]);
     m
 });
 
