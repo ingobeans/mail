@@ -180,7 +180,9 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(128).unwrap(),
             draw_condition: &|this, player, _| {
-                player.tags.contains(&Tag::HasBirdFood) && player.pos.distance(this.pos) <= 32.0
+                player.tags.contains(&Tag::HasBirdFood)
+                    && !player.tags.contains(&Tag::HasFedBird)
+                    && player.pos.distance(this.pos) <= 32.0
             },
             draw_type: DrawType::TextBubble(String::from(
                 "return when youve fed
@@ -189,9 +191,45 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             ..Default::default()
         },
         Entity {
+            pos: world.get_interactable_spawn(128).unwrap(),
+            draw_condition: &|this, player, _| {
+                if player.tags.contains(&Tag::HasFedBird) && player.pos.distance(this.pos) <= 32.0 {
+                    player.tags.push(Tag::TonyHasOpenedDoor);
+                    true
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from("thanks!")),
+            ..Default::default()
+        },
+        Entity {
             pos: world.get_interactable_spawn(612).unwrap(),
+            draw_condition: &|_, player, _| !player.tags.contains(&Tag::HasFedBird),
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/bird.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(612).unwrap(),
+            draw_condition: &|this, player, assets| {
+                if player.tags.contains(&Tag::HasBirdFood)
+                    && !player.tags.contains(&Tag::HasFedBird)
+                    && player.pos.distance(this.pos) <= 32.0
+                {
+                    show_tooltip("e: feed bird", Tag::HasFedBird, assets, player);
+                }
+                false
+            },
+            draw_type: DrawType::None,
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(612).unwrap(),
+            draw_condition: &|_, player, _| player.tags.contains(&Tag::HasFedBird),
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/bird_eating.ase"
             ))),
             ..Default::default()
         },

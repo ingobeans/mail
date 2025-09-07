@@ -21,6 +21,8 @@ fn ceil_g(a: f32) -> f32 {
 pub enum Tag {
     HasMail,
     HasBirdFood,
+    HasFedBird,
+    TonyHasOpenedDoor,
 }
 
 pub struct Player {

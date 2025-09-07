@@ -206,6 +206,17 @@ impl World {
     pub fn get_one_way_collision_chunk(&self, x: i16, y: i16) -> Option<&Chunk> {
         self.one_way_collision.iter().find(|f| f.x == x && f.y == y)
     }
+    pub fn set_collision_tile(&mut self, x: i16, y: i16, tile: i16) {
+        let cx = ((x as f32 / 16.0).floor() * 16.0) as i16;
+        let cy = ((y as f32 / 16.0).floor() * 16.0) as i16;
+
+        let chunk = self
+            .collision
+            .iter_mut()
+            .find(|f| f.x == cx && f.y == cy)
+            .unwrap();
+        chunk.tiles[(x - chunk.x + (y - chunk.y) * 16) as usize] = tile;
+    }
 }
 impl Default for World {
     fn default() -> Self {

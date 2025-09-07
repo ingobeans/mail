@@ -24,7 +24,7 @@ async fn main() {
     }
     let assets = Assets::default();
     let mut pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
-    let world = World::default();
+    let mut world = World::default();
     let mut entities = get_entities(&world);
     let mut player = Player::new();
 
@@ -63,6 +63,11 @@ async fn main() {
 
         for entity in entities.iter_mut() {
             entity.draw(&mut player, &assets);
+        }
+
+        if player.tags.contains(&Tag::TonyHasOpenedDoor) {
+            world.set_collision_tile(79, 1, 0);
+            world.set_collision_tile(79, 2, 0);
         }
 
         player.draw(&assets);
