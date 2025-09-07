@@ -1,4 +1,5 @@
 use asefile::AsepriteFile;
+use hashmap_macro::hashmap;
 use image::EncodableLayout;
 use macroquad::prelude::*;
 
@@ -6,6 +7,7 @@ use crate::utils::*;
 
 pub struct Assets {
     pub tileset: Spritesheet,
+    pub font: Spritesheet,
 }
 impl Default for Assets {
     fn default() -> Self {
@@ -14,7 +16,60 @@ impl Default for Assets {
                 load_ase_texture(include_bytes!("../assets/tileset.ase"), None),
                 8.0,
             ),
+            font: Spritesheet::new(
+                load_ase_texture(include_bytes!("../assets/font.ase"), None),
+                4.0,
+            ),
         }
+    }
+}
+impl Assets {
+    pub fn draw_text(&self, text: &str, mut x: f32, mut y: f32) -> (f32, f32) {
+        let original_x = x;
+        let original_y = y;
+        let hardcoded =
+            hashmap!(':'=>36,'.'=>37,'-'=>38,'%'=>39,'+'=>40,'/'=>41,'H'=>42,'('=>43,')'=>44);
+        gl_use_material(&COLOR_MOD_MATERIAL);
+        COLOR_MOD_MATERIAL.set_uniform("color", COLORS[1]);
+        let mut start_of_line = true;
+
+        for char in text.chars() {
+            if char == '\n' {
+                start_of_line = true;
+                y += 5.0;
+                x = original_x;
+                continue;
+            } else if char == ' ' {
+                if start_of_line {
+                    continue;
+                }
+                x += 4.0;
+                continue;
+            }
+            let code = char as u8;
+            if code < COLORS.len() as u8 {
+                COLOR_MOD_MATERIAL.set_uniform("color", COLORS[code as usize]);
+            }
+
+            let index = if let Some(value) = hardcoded.get(&char) {
+                *value
+            } else if code.is_ascii_lowercase() {
+                code - b'a'
+            } else if code.is_ascii_digit() {
+                code - b'0' + 26
+            } else {
+                continue;
+            };
+            start_of_line = false;
+            self.font
+                .draw_sprite(x + 2.0, y + 2.0, index as f32, 0.0, None);
+
+            x += 4.0
+        }
+
+        COLOR_MOD_MATERIAL.set_uniform("color", COLORS[0]);
+        gl_use_default_material();
+        (x - original_x, y - original_y)
     }
 }
 fn load_ase_texture(bytes: &[u8], layer: Option<u32>) -> Texture2D {
@@ -133,6 +188,19 @@ pub struct World {
     pub interactable: Vec<Chunk>,
 }
 impl World {
+    pub fn get_interactable_spawn(&self, tile_index: i16) -> Option<Vec2> {
+        for chunk in self.interactable.iter() {
+            for (i, tile) in chunk.tiles.iter().enumerate() {
+                if *tile == tile_index + 1 {
+                    return Some(Vec2::new(
+                        (i as i16 % 16 + chunk.x) as f32 * 8.0,
+                        (i as i16 / 16 + chunk.y) as f32 * 8.0,
+                    ));
+                }
+            }
+        }
+        None
+    }
     pub fn get_collision_chunk(&self, x: i16, y: i16) -> Option<&Chunk> {
         self.collision.iter().find(|f| f.x == x && f.y == y)
     }

@@ -2,9 +2,10 @@ use std::env::args;
 
 use macroquad::{miniquad::window::screen_size, prelude::*, time};
 
-use crate::{assets::*, player::*, utils::*};
+use crate::{assets::*, entities::get_entities, player::*, utils::*};
 
 mod assets;
+mod entities;
 mod player;
 mod utils;
 
@@ -24,7 +25,11 @@ async fn main() {
     let assets = Assets::default();
     let mut pixel_camera = create_camera(SCREEN_WIDTH, SCREEN_HEIGHT);
     let world = World::default();
+    let mut entities = get_entities(&world);
     let mut player = Player::new();
+
+    player.pos = Vec2::new(-6.0 * 8.0, 2.0 * 8.0);
+    player.facing_right = false;
 
     let mut last = time::get_time();
 
@@ -54,6 +59,10 @@ async fn main() {
         }
         for chunk in world.one_way_collision.iter() {
             chunk.draw(&assets);
+        }
+
+        for entity in entities.iter_mut() {
+            entity.draw(&mut player, &assets);
         }
 
         player.draw(&assets);

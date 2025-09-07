@@ -17,6 +17,11 @@ fn ceil_g(a: f32) -> f32 {
     if a < 0.0 { a.floor() } else { a.ceil() }
 }
 
+#[derive(PartialEq)]
+pub enum Tag {
+    HasInteractedWithHenry,
+}
+
 pub struct Player {
     pub pos: Vec2,
     pub velocity: Vec2,
@@ -25,6 +30,7 @@ pub struct Player {
     pub on_ground: bool,
     pub debug_tiles: Vec<(f32, f32, f32, f32, Color)>,
     pub jump_frames: u8,
+    pub tags: Vec<Tag>,
     idle_animation: Animation,
     walk_animation: Animation,
 }
@@ -38,6 +44,7 @@ impl Player {
             facing_right: true,
             on_ground: false,
             debug_tiles: Vec::new(),
+            tags: Vec::new(),
             idle_animation: Animation::from_file(include_bytes!(
                 "../assets/entities/player/idle.ase"
             )),

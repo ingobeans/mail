@@ -1,9 +1,10 @@
 [package]
 name = "mail"
-version = "0.1.13"
+version = "0.1.14"
 edition = "2024"
 
 [dependencies]
 asefile = "0.3.8"
 macroquad = "0.4.14"
 image = "0.24.9"
+hashmap_macro = "0.1.0"

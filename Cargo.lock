@@ -216,6 +216,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashmap_macro"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8a181d5ff5b742b5a830beb8c172562e6f22dccba6e1308bbacaba9fda84c8d"
+
+[[package]]
 name = "image"
 version = "0.24.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -282,9 +288,10 @@ checksum = "64b1d96218903768c1ce078b657c0d5965465c95a60d2682fd97443c9d2483dd"
 
 [[package]]
 name = "mail"
-version = "0.1.13"
+version = "0.1.14"
 dependencies = [
  "asefile",
+ "hashmap_macro",
  "image",
  "macroquad",
 ]
