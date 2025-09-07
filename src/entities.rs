@@ -146,7 +146,12 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(128).unwrap(),
             draw_condition: &|this, player, _| {
-                !player.tags.contains(&Tag::HasBirdFood) && player.pos.distance(this.pos) > 32.0
+                player.pos.distance(this.pos) > 32.0
+                    && (!player.tags.contains(&Tag::HasBirdFood)
+                        || (player.tags.contains(&Tag::HasFedBird)
+                            && !player.tags.contains(&Tag::TonyHasOpenedDoor))
+                        || player.tags.contains(&Tag::HasBeeninGiftStore)
+                            && !player.tags.contains(&Tag::HasMilk))
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/poi.ase"
@@ -237,7 +242,7 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
             pos: world.get_interactable_spawn(288).unwrap(),
             draw_condition: &|this, player, _| {
                 player.tags.contains(&Tag::TonyHasOpenedDoor)
-                    && !player.tags.contains(&Tag::HasGift)
+                    && !player.tags.contains(&Tag::HasGivenGift)
                     && player.pos.distance(this.pos) > 32.0
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
