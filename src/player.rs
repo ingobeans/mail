@@ -19,6 +19,8 @@ fn ceil_g(a: f32) -> f32 {
 
 #[derive(PartialEq)]
 pub enum Tag {
+    GameStarted,
+    StartAnimationFinished,
     HasMail,
     HasBirdFood,
     HasFedBird,
@@ -72,6 +74,8 @@ impl Player {
         #[cfg(not(debug_assertions))]
         let noclip = { false };
 
+        let can_move = self.tags.contains(&Tag::StartAnimationFinished);
+
         let mut forces = Vec2::ZERO;
 
         if !noclip {
@@ -80,19 +84,22 @@ impl Player {
 
         forces = forces.clamp_length_max(8.0);
 
-        if is_key_down(KeyCode::A) {
-            forces.x -= 1.0;
-            self.facing_right = false;
-        }
-        if is_key_down(KeyCode::D) {
-            forces.x += 1.0;
-            self.facing_right = true;
+        if can_move {
+            if is_key_down(KeyCode::A) {
+                forces.x -= 1.0;
+                self.facing_right = false;
+            }
+            if is_key_down(KeyCode::D) {
+                forces.x += 1.0;
+                self.facing_right = true;
+            }
         }
 
         if self.on_ground {
             self.jump_frames = 0;
         }
-        if is_key_down(KeyCode::Space)
+        if can_move
+            && is_key_down(KeyCode::Space)
             && (self.on_ground || (self.jump_frames > 0 && self.jump_frames < 5))
         {
             forces.y -= if self.jump_frames == 0 { 3.5 } else { 1.0 };
@@ -218,6 +225,10 @@ impl Player {
         }
         self.velocity.x = self.velocity.x.clamp(-MAX_VELOCITY, MAX_VELOCITY);
         self.pos = new;
+
+        if self.pos.y >= 2.0 * 8.0 && !can_move {
+            self.tags.push(Tag::StartAnimationFinished);
+        }
     }
     pub fn draw(&self, _assets: &Assets) {
         let animation = if self.velocity.length() != 0.0 {

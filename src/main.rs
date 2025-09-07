@@ -28,7 +28,7 @@ async fn main() {
     let mut entities = get_entities(&world);
     let mut player = Player::new();
 
-    player.pos = Vec2::new(-6.0 * 8.0, 2.0 * 8.0);
+    player.pos = Vec2::new(-6.0 * 8.0, 2.0 * 8.0 - 20.0 * 8.0);
     player.facing_right = false;
 
     let mut last = time::get_time();
@@ -43,7 +43,25 @@ async fn main() {
         let mouse_x = mouse_x / scale_factor;
         let mouse_y = mouse_y / scale_factor;
 
-        if player.tags.contains(&Tag::HasCarrot) {
+        if !player.tags.contains(&Tag::GameStarted) {
+            // handle menu screen
+            pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+            set_camera(&pixel_camera);
+            // draw background
+            clear_background(Color::from_hex(0x422433));
+            draw_texture(&assets.menu_screen, 0.0, 0.0, WHITE);
+            if draw_button(
+                &assets.start_button,
+                &assets.start_button_hovered,
+                102.0,
+                68.0,
+                mouse_x,
+                mouse_y,
+                false,
+            ) {
+                player.tags.push(Tag::GameStarted);
+            }
+        } else if player.tags.contains(&Tag::HasCarrot) {
             // handle win screen
             pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
             set_camera(&pixel_camera);
