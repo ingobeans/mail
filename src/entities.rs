@@ -102,7 +102,10 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(64).unwrap(),
             draw_condition: &|this, player, _| {
-                !player.tags.contains(&Tag::HasMail) && player.pos.distance(this.pos) > 32.0
+                (!player.tags.contains(&Tag::HasMail)
+                    || player.tags.contains(&Tag::HenryHasOfferedCarrot))
+                    || player.tags.contains(&Tag::MailHasBeenSent)
+                        && player.pos.distance(this.pos) > 32.0
             },
             draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
                 "../assets/entities/poi.ase"
@@ -135,11 +138,53 @@ pub fn get_entities(world: &World) -> Vec<Entity> {
         Entity {
             pos: world.get_interactable_spawn(64).unwrap(),
             draw_condition: &|this, player, _| {
-                player.pos.distance(this.pos) <= 32.0 && player.tags.contains(&Tag::HasMail)
+                player.pos.distance(this.pos) <= 32.0
+                    && player.tags.contains(&Tag::HasMail)
+                    && !player.tags.contains(&Tag::MailHasBeenSent)
             },
             draw_type: DrawType::TextBubble(String::from(
                 "thanks! return when
                 you have posted it",
+            )),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(64).unwrap() + Vec2::new(-4.0, 12.0),
+            draw_condition: &|this, player, _| {
+                if !player.tags.contains(&Tag::HasReturnedToHenry) {
+                    player.tags.push(Tag::HasReturnedToHenry);
+                }
+                if this.lifetime >= 3750 {
+                    player.tags.push(Tag::HenryHasOfferedCarrot);
+                    this.lifetime = 3700;
+                }
+                (player.pos.distance(this.pos) <= 32.0 || this.lifetime > 0)
+                    && player.tags.contains(&Tag::MailHasBeenSent)
+            },
+            draw_type: DrawType::Animation(Animation::from_file(include_bytes!(
+                "../assets/entities/henry_get_reward.ase"
+            ))),
+            ..Default::default()
+        },
+        Entity {
+            pos: world.get_interactable_spawn(64).unwrap(),
+            draw_condition: &|this, player, assets| {
+                if player.tags.contains(&Tag::HenryHasOfferedCarrot) {
+                    if player.pos.distance(this.pos) <= 32.0 {
+                        if player.pos.distance(this.pos) <= 32.0 {
+                            show_tooltip("e: accept carrot", Tag::HasCarrot, assets, player);
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
+            draw_type: DrawType::TextBubble(String::from(
+                "take this carrot
+                as a reward!",
             )),
             ..Default::default()
         },

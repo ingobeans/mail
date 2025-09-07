@@ -48,8 +48,16 @@ async fn main() {
         let mouse_x = mouse_x / scale_factor;
         let mouse_y = mouse_y / scale_factor;
 
-        // handle gift selection screen
-        if player.tags.contains(&Tag::SelectingGift) && !player.tags.contains(&Tag::HasGift) {
+        if player.tags.contains(&Tag::HasCarrot) {
+            // handle win screen
+            pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+            set_camera(&pixel_camera);
+            // draw background
+            clear_background(Color::from_hex(0x422433));
+            draw_texture(&assets.win_screen, 0.0, 0.0, WHITE);
+        } else if player.tags.contains(&Tag::SelectingGift) && !player.tags.contains(&Tag::HasGift)
+        {
+            // handle gift selection screen
             pixel_camera.target = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
             set_camera(&pixel_camera);
             // draw background

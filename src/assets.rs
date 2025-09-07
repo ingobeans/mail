@@ -8,6 +8,7 @@ use crate::utils::*;
 pub struct Assets {
     pub tileset: Spritesheet,
     pub gift_selection_screen: Texture2D,
+    pub win_screen: Texture2D,
     pub gift_sprites: Animation,
     pub arrow: Texture2D,
     pub arrow_hovered: Texture2D,
@@ -24,6 +25,7 @@ impl Default for Assets {
                 include_bytes!("../assets/gift_selection_screen.ase"),
                 None,
             ),
+            win_screen: load_ase_texture(include_bytes!("../assets/win_screen.ase"), None),
             arrow: load_ase_texture(include_bytes!("../assets/arrow.ase"), None),
             arrow_hovered: load_ase_texture(include_bytes!("../assets/arrow_hovered.ase"), None),
             gift_sprites: Animation::from_file(include_bytes!("../assets/gifts.ase")),

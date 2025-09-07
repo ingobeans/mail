@@ -29,6 +29,9 @@ pub enum Tag {
     HasBeeninGiftStore,
     HasMilk,
     SelectingGift,
+    HasReturnedToHenry,
+    HenryHasOfferedCarrot,
+    HasCarrot,
 }
 
 pub struct Player {
