@@ -8,9 +8,13 @@ its not always clear where youre supposed to go, which is intentional! explore e
 
 ## play
 
-you can play right here on the web!
+you can play right here on the web! 
 
-URL: https://ingobeans.github.io/mail/
+itch.io url: [here](https://gnarmi.itch.io/mail)
+
+
+
+you can also play through github pages but its a better experience over on itch. if you do however want to do that, it would be [this](https://ingobeans.github.io/mail/) link.
 
 # building from source
 
